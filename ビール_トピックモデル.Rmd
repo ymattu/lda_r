@@ -1,16 +1,17 @@
 ---
-title: "ƒr[ƒ‹ƒŒƒrƒ…[‚Ì²ŒŸ“¢"
-author: "¼‘º—DÆ"
-date: "2016”N7Œ11“ú"
+title: "hoge"
+author: 
+date: "2016å¹´7æœˆ11æ—¥"
 output: html_document
 ---
 
-#ŠT—v
-ƒgƒsƒbƒNƒ‚ƒfƒ‹‚ğg‚Á‚ÄAŒ`‘Ô‘f‰ğÍ‚¾‚¯‚Å‚ÍŒ©‚Â‚¯‚ç‚ê‚È‚¢V‚½‚È²‚ğ”­Œ©‚Å‚«‚È‚¢‚©H
+#æ¦‚è¦
+ãƒˆãƒ”ãƒƒã‚¯ãƒ¢ãƒ‡ãƒ«
+Windowsã§å®Ÿæ–½
 
-#ƒf[ƒ^‚Ì€”õ‚ÆŠTŠÏ
+#ãƒ‡ãƒ¼ã‚¿ã®æº–å‚™ã¨æ¦‚è¦³
 ```{r warning=FALSE}
-#€”õ----
+#æº–å‚™----
 setwd("C:/Users/yuya_matsumura/Desktop/yahoo_lohaco/review/beer")
 
 library(readr)
@@ -22,120 +23,110 @@ library(ggplot2)
 library(knitr)
 
 
-##“Ç‚İ‚İ
-dat <- read_csv("review_10k_2.csv", locale = locale(encoding = "cp932"))
+##èª­ã¿è¾¼ã¿
+dat <- read_csv("hoge.csv", locale = locale(encoding = "cp932"))
 ```
 
-‚Ü‚¸‚Í‚Ç‚Ìƒr[ƒ‹‚É‘½‚­ƒRƒƒ“ƒg‚³‚ê‚Ä‚¢‚é‚©‚ğ’²‚×‚é
+ã¾ãšã¯ã©ã®ãƒ“ãƒ¼ãƒ«ã«å¤šãã‚³ãƒ¡ãƒ³ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹ã‚’èª¿ã¹ã‚‹
 ```{r}
 beer_all <- dat %>%
-  filter(str_detect(dat$web_s_name, "ƒr[ƒ‹") == "TRUE") %>%
+  filter(str_detect(dat$web_s_name, "ãƒ“ãƒ¼ãƒ«") == "TRUE") %>%
   group_by(web_unique_name) %>%
   summarise(n = n()) %>%
   arrange(desc(n))
-kable(head(beer_all, 10)) #æ“ª10s‚ğ•\¦
+kable(head(beer_all, 10)) #å…ˆé ­10è¡Œã‚’è¡¨ç¤º
 ```
 
-Ÿ‚Éƒr[ƒ‹‚Ö‚ÌƒRƒƒ“ƒgƒf[ƒ^‚Ìì¬B
+æ¬¡ã«ãƒ“ãƒ¼ãƒ«ã¸ã®ã‚³ãƒ¡ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿ã®ä½œæˆã€‚
 ```{r}
 beer <- dat %>%
-  filter(str_detect(dat$web_s_name, "ƒr[ƒ‹") == "TRUE") %>%
+  filter(str_detect(dat$web_s_name, "ãƒ“ãƒ¼ãƒ«") == "TRUE") %>%
   select(comment)
 kable(head(beer, 10))
 ```
 
-#²‚ÌŒŸ“¢
-##‘½‚­g‚í‚ê‚Ä‚¢‚éŒê‚ğg—p‚·‚é
+
+##å¤šãä½¿ã‚ã‚Œã¦ã„ã‚‹èªã‚’ä½¿ç”¨ã™ã‚‹
 ```{r}
-##RMeCabFreq‚Ì‚²‚İ‘|œ—p‚ÌŠÖ”‚ğì¬----
+##RMeCabFreqã®ã”ã¿æƒé™¤ç”¨ã®é–¢æ•°ã‚’ä½œæˆ----
 trush_delete <- function (x) {
-  x <- dplyr::filter(x, Info1 == c("–¼Œ", "Œ`—eŒ"), 
-              Info2 != "”ñ©—§",
-              #stringr::str_length(x$Term) > 1, #•¶š”2ˆÈã
+  x <- dplyr::filter(x, Info1 == c("åè©", "å½¢å®¹è©"), 
+              Info2 != "éè‡ªç«‹",
+              #stringr::str_length(x$Term) > 1, #æ–‡å­—æ•°2ä»¥ä¸Š
               stringr::str_detect(x$Term, '[:punct:]') == 'FALSE', 
-              str_detect(x$Term, '[A-z0-9]') == 'FALSE', #ƒAƒ‹ƒtƒ@ƒxƒbƒg‚Æ”š
-              str_detect(x$Term, '[ƒŸ-ƒÖ]') == 'FALSE', #ƒMƒŠƒVƒƒ•¶š
-              str_detect(x$Term, '[„@-„‘]') == 'FALSE', #ƒLƒŠƒ‹•¶š
-              str_detect(x$Term, '[¦-İ]') == 'FALSE' #”¼ŠpƒJƒ^ƒJƒi
+              str_detect(x$Term, '[A-z0-9]') == 'FALSE', #ã‚¢ãƒ«ãƒ•ã‚¡ãƒ™ãƒƒãƒˆã¨æ•°å­—
+              str_detect(x$Term, '[Î‘-Ï‰]') == 'FALSE', #ã‚®ãƒªã‚·ãƒ£æ–‡å­—
+              str_detect(x$Term, '[Ğ-Ñ]') == 'FALSE', #ã‚­ãƒªãƒ«æ–‡å­—
+              str_detect(x$Term, '[ï½¦-ï¾]') == 'FALSE' #åŠè§’ã‚«ã‚¿ã‚«ãƒŠ
   )
 }
 
-#Œ`‘Ô‘f‰ğÍ(1Œê)
+#å½¢æ…‹ç´ è§£æ(1èª)
 uni_beer <- RMeCabFreq("beer.csv") %>%
   trush_delete() %>%
   arrange(desc(Freq))
-##write.csv(uni_beer, "ƒr[ƒ‹Œ`‘Ô‘f.csv", row.names = FALSE)
+##write.csv(uni_beer, "ãƒ“ãƒ¼ãƒ«å½¢æ…‹ç´ .csv", row.names = FALSE)
 kable(head(uni_beer, 10))
 
-#ƒoƒCƒOƒ‰ƒ€(2Œê‚Ì‘g‚İ‡‚í‚¹)
+#ãƒã‚¤ã‚°ãƒ©ãƒ (2èªã®çµ„ã¿åˆã‚ã›)
 bi_beer <- docDF(target = "beer.csv", type = 1, N = 2, Genkei = 1) %>%
   arrange(desc(beer.csv))
-##write.csv(bi_beer, "ƒr[ƒ‹ƒoƒCƒOƒ‰ƒ€.csv", row.names = FALSE)
+##write.csv(bi_beer, "ãƒ“ãƒ¼ãƒ«ãƒã‚¤ã‚°ãƒ©ãƒ .csv", row.names = FALSE)
 kable(head(bi_beer, 10))
 
-#ƒgƒŠƒOƒ‰ƒ€(3Œê‚Ì‘g‚İ‡‚í‚¹)
+#ãƒˆãƒªã‚°ãƒ©ãƒ (3èªã®çµ„ã¿åˆã‚ã›)
 tri_beer <- docDF(target = "beer.csv", type = 1, N = 3, Genkei = 1) %>%
   arrange(desc(beer.csv))
-##write.csv(tri_beer, "ƒr[ƒ‹ƒgƒŠƒOƒ‰ƒ€.csv", row.names = FALSE)
+##write.csv(tri_beer, "ãƒ“ãƒ¼ãƒ«ãƒˆãƒªã‚°ãƒ©ãƒ .csv", row.names = FALSE)
 kable(head(tri_beer, 10))
 ```
 
-###²‚ÌŒŸ“¢
-ˆÈã‚ÌŒ‹‰Ê‚©‚çAˆÈ‰º‚Ì“ñ‚Â‚Ì‘Î—§²‚ğì¬B
+##ãƒˆãƒ”ãƒƒã‚¯ãƒ¢ãƒ‡ãƒ«ã§ã®è©•ä¾¡
+ä»Šå›ã¯æ½œåœ¨ãƒ‡ã‚£ãƒªã‚¯ãƒ¬éç¨‹(Latent Dirichlet Allocation, LDA)ã‚’ç”¨ã„ãŸã€‚
 
-* uŒ’NuŒüi‰¿ŠiˆÀ‚ßjvu‚‹‰uŒüv
-* uˆù‚İ‚â‚·‚³vuˆù‚İ‚²‚½‚¦v
-
-‚µ‚©‚µAƒXƒRƒAƒŠƒ“ƒO‚ÌŒ‹‰Ê‚ ‚Ü‚èˆÀ’è‚µ‚È‚©‚Á‚½B
-
-‚»‚±‚ÅAƒgƒsƒbƒNƒ‚ƒfƒ‹‚É‚æ‚éV‚½‚È²‚Ìì¬‚ğ‚İ‚éB
-
-##ƒgƒsƒbƒNƒ‚ƒfƒ‹‚Å‚Ì•]‰¿
-¡‰ñ‚ÍöİƒfƒBƒŠƒNƒŒ‰ß’ö(Latent Dirichlet Allocation, LDA)‚ğ—p‚¢‚½B
-
-###LDA‚Æ‚Í
-1‚Â‚Ì•¶‘‚ª•¡”‚ÌƒgƒsƒbƒN‚©‚ç¬‚é‚±‚Æ‚ğ‰¼’è‚µ‚½Œ¾Œêƒ‚ƒfƒ‹‚ÌˆêíBÚ×‚ÍˆÈ‰º‚Ì‰æ‘œ‚¨‚æ‚Ñˆø—pæ‚ğQÆB
+###LDAã¨ã¯
+1ã¤ã®æ–‡æ›¸ãŒè¤‡æ•°ã®ãƒˆãƒ”ãƒƒã‚¯ã‹ã‚‰æˆã‚‹ã“ã¨ã‚’ä»®å®šã—ãŸè¨€èªãƒ¢ãƒ‡ãƒ«ã®ä¸€ç¨®ã€‚è©³ç´°ã¯ä»¥ä¸‹ã®ç”»åƒãŠã‚ˆã³å¼•ç”¨å…ˆã‚’å‚ç…§ã€‚
 
 ![](http://f.st-hatena.com/images/fotolife/n/ni66ling/20150504/20150504032913_original.png?1430677772)
 
-iˆø—pF[LDA‚ÌŠe•Ï”‚ÌˆÓ–¡‚ÆŠô‰½“I‰ğß‚É‚Â‚¢‚Ä](http://ni66ling.hatenadiary.jp/entry/2015/05/04/163958)j
+ï¼ˆå¼•ç”¨ï¼š[LDAã®å„å¤‰æ•°ã®æ„å‘³ã¨å¹¾ä½•çš„è§£é‡ˆã«ã¤ã„ã¦](http://ni66ling.hatenadiary.jp/entry/2015/05/04/163958)ï¼‰
 
-$\alpha$‚Æ$\beta$(ƒvƒƒOƒ‰ƒ€ã‚Í$\eta$‚É‚È‚Á‚Ä‚¢‚é)‚ÍƒnƒCƒp[ƒpƒ‰ƒ[ƒ^‚Æ‚µ‚Ä—^‚¦‚éB
+$\alpha$ã¨$\beta$(ãƒ—ãƒ­ã‚°ãƒ©ãƒ ä¸Šã¯$\eta$ã«ãªã£ã¦ã„ã‚‹)ã¯ãƒã‚¤ãƒ‘ãƒ¼ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¨ã—ã¦ä¸ãˆã‚‹ã€‚
 
-¡‰ñ‚Í1ƒRƒƒ“ƒg1•¶‘‚Æ‚µ‚Ä•ªÍ‚ğs‚Á‚½B
+ä»Šå›ã¯1ã‚³ãƒ¡ãƒ³ãƒˆ1æ–‡æ›¸ã¨ã—ã¦åˆ†æã‚’è¡Œã£ãŸã€‚
 
-###LDA‚ÌÀs
+###LDAã®å®Ÿè¡Œ
 ```{r}
-#ƒgƒsƒbƒNƒ‚ƒfƒ‹----
-##Œ`‘Ô‘f‰ğÍ
+#ãƒˆãƒ”ãƒƒã‚¯ãƒ¢ãƒ‡ãƒ«----
+##å½¢æ…‹ç´ è§£æ
 beer_txt <- RMeCabText("beer.csv")
 
-##‹ó‚Ìƒf[ƒ^ƒtƒŒ[ƒ€‚ğì¬
+##ç©ºã®ãƒ‡ãƒ¼ã‚¿ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ä½œæˆ
 beer_doc <- NULL
 
-##—v‘f‚Ìˆê”ÔÅ‰i•¶’†‚ÉoŒ»‚·‚éŒêŒ`j‚Ì‚İæ‚èo‚·
+##è¦ç´ ã®ä¸€ç•ªæœ€åˆï¼ˆæ–‡ä¸­ã«å‡ºç¾ã™ã‚‹èªå½¢ï¼‰ã®ã¿å–ã‚Šå‡ºã™
 for (i in 1:length(beer_txt)) {
-  if (beer_txt[[i]][2] %in% c("–¼Œ", "Œ`—eŒ")) {
+  if (beer_txt[[i]][2] %in% c("åè©", "å½¢å®¹è©")) {
     beer_doc <- c(beer_doc, paste(beer_txt[[i]][1], sep = "", collapse = " "))
   }
 }
 
-##ƒR[ƒpƒX‚Ìì¬
+##ã‚³ãƒ¼ãƒ‘ã‚¹ã®ä½œæˆ
 beer_lex <- lexicalize(beer_doc, lower = TRUE)
 
-##ƒMƒbƒuƒXƒTƒ“ƒvƒŠƒ“ƒO‚Å‰ğÍ
-k <- 10 #ƒgƒsƒbƒN”
+##ã‚®ãƒƒãƒ–ã‚¹ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã§è§£æ
+k <- 10 #ãƒˆãƒ”ãƒƒã‚¯æ•°
 
 set.seed(123)
 result <- lda.collapsed.gibbs.sampler(beer_lex$documents, 
                                       k,
                                       beer_lex$vocab,
                                       burnin = 500,
-                                      1000,  # ŒJ‚è•Ô‚µ”
-                                      10, # ƒgƒsƒbƒN‚Ì¶‹Nƒpƒ‰ƒ[ƒ^alpha
-                                      1, # ƒfƒBƒŠƒNƒŒ•ª•z‚ÌƒXƒJƒ‰ƒpƒ‰ƒ[ƒ^eta
+                                      1000,  # ç¹°ã‚Šè¿”ã—æ•°
+                                      10, # ãƒˆãƒ”ãƒƒã‚¯ã®ç”Ÿèµ·ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿alpha
+                                      1, # ãƒ‡ã‚£ãƒªã‚¯ãƒ¬åˆ†å¸ƒã®ã‚¹ã‚«ãƒ©ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿eta
                                       compute.log.likelihood=TRUE)
-## Œ‹‰Ê‚ğ•\¦ 
+## çµæœã‚’è¡¨ç¤º 
 summary(result)
 #head(result$log.likelihoods)
 
@@ -144,37 +135,24 @@ log_likelihoods <- t(result$log.likelihoods) %>%
 
 Iteration <- 1:nrow(log_likelihoods)
 
-##‘Î”–Ş“x‚ğƒvƒƒbƒgBû‘©‚ÌŠm”FB
+##å¯¾æ•°å°¤åº¦ã‚’ãƒ—ãƒ­ãƒƒãƒˆã€‚åæŸã®ç¢ºèªã€‚
 ggplot(log_likelihoods, aes(x = Iteration, y = Log_Likelihoods)) +
   geom_line(aes(y = V1, colour = "V1")) +
   geom_line(aes(y = V2, colour = "V2")) +
-  scale_color_hue(name = "í—Ş", labels = c(V1 = "Full", V2 ="Obs") )
+  scale_color_hue(name = "ç¨®é¡", labels = c(V1 = "Full", V2 ="Obs") )
 ```
 
-Ô‚ª–‘O•ª•z‚ğŠÜ‚ß‚½‘Î”–Ş“xAÂ‚ªŠÏ‘ª‚³‚ê‚½‚à‚Ì‚©‚ç‚Ì‚İ‚Ì‘Î”–Ş“xB
-Â‚¢‚Ù‚¤‚É’–Ú‚·‚ê‚Î‚æ‚­A‘Î”–Ş“x‚ªû‘©‚µ‚Ä‚¢‚é‚±‚Æ‚ğŠm”FB
+èµ¤ãŒäº‹å‰åˆ†å¸ƒã‚’å«ã‚ãŸå¯¾æ•°å°¤åº¦ã€é’ãŒè¦³æ¸¬ã•ã‚ŒãŸã‚‚ã®ã‹ã‚‰ã®ã¿ã®å¯¾æ•°å°¤åº¦ã€‚
+é’ã„ã»ã†ã«æ³¨ç›®ã™ã‚Œã°ã‚ˆãã€å¯¾æ•°å°¤åº¦ãŒåæŸã—ã¦ã„ã‚‹ã“ã¨ã‚’ç¢ºèªã€‚
 
 ```{r}
-## ŠeƒgƒsƒbƒN‚É‚¨‚¯‚éãˆÊ5ˆÊ‚Ì’PŒê‚Ìs—ñ
-##(ŠeƒgƒsƒbƒN‚ÅŒ»‚ê‚éŠm—¦‚ª‚‚¢’PŒê)
+## å„ãƒˆãƒ”ãƒƒã‚¯ã«ãŠã‘ã‚‹ä¸Šä½5ä½ã®å˜èªã®è¡Œåˆ—
+##(å„ãƒˆãƒ”ãƒƒã‚¯ã§ç¾ã‚Œã‚‹ç¢ºç‡ãŒé«˜ã„å˜èª)
 top.words <- top.topic.words(result$topics, 5, by.score = TRUE) %>%
   as_data_frame()
 colnames(top.words) <- c("Topic1", "Topic2", "Topic3", "Topic4", "Topic5", "Topic6", "Topic7", "Topic8", "Topic9", "Topic10")
 kable(top.words)
 ```
 
-ã‹L‚ÍAƒr[ƒ‹‚ÌƒRƒƒ“ƒg‚É‚¨Œ»‚ê‚éƒgƒsƒbƒN‚ÆA‚»‚ÌƒgƒsƒbƒN’†‚ÉŒ»‚ê‚éãˆÊ‚T’PŒê‚ğ‚ ‚ç‚í‚µ‚½‚à‚Ì‚ÅA‚±‚±‚©‚çŠeƒgƒsƒbƒN‚ğ‰ğß‚µA²‚Ìì¬‚É–ğ—§‚Ä‚éB
-‚±‚ê‚ç‚ÌƒgƒsƒbƒN‚Í‰ğß‰Â”\‚È‚à‚Ì‚Æ•s‰Â”\‚È‚à‚Ì‚ª‚ ‚é‚ªA‰ğß‰Â”\‚È‚à‚Ì‚ÍˆÈ‰º‚Ì‚æ‚¤‚É‰ğß‚Å‚«‚éB
-
-* ƒgƒsƒbƒN2: LOHACO‚ÌƒT[ƒrƒX‚É‘Î‚·‚éD•]‰¿
-* ƒgƒsƒbƒN5: ƒmƒ“ƒAƒ‹ƒR[ƒ‹iƒr[ƒ‹ƒeƒCƒXƒgˆù—¿j‚Ö‚ÌƒŒƒrƒ…[
-* ƒgƒsƒbƒN6: ƒgƒNƒz‚âiƒJƒƒŠ[‚È‚Ç‚ªj0‚Ì‚à‚Ì‚Ö‚ÌƒŒƒrƒ…[
-* ƒgƒsƒbƒN7: Œ’NuŒüA“œ•ª0
-* ƒgƒsƒbƒN8: Œ’NuŒüA‰–b0
-
-#Œ‹˜_
-LDA‚É‚æ‚éƒRƒƒ“ƒg‚ÌƒNƒ‰ƒXƒ^ƒŠƒ“ƒO‚ğs‚Á‚½‚ªAV‚½‚È²‚ğ”­Œ©‚·‚é‚±‚Æ‚Í‚Å‚«‚È‚©‚Á‚½B
-
-²‚Æ‚µ‚Ä•]‰¿‚Å‚«‚é‚Ì‚ÍuŒ’NuŒüv‚Ì‚İ‚¾‚Á‚½BÀÛAƒXƒRƒAƒŠƒ“ƒO‚ÌŒ‹‰Ê‚àŒ’NuŒüˆÈŠO‚ÍŠÖŒW‚È‚¢ƒRƒƒ“ƒg‚ªƒXƒRƒAãˆÊ‚Å‚ ‚Á‚½Bi“Á‚Éud‚¢‚à‚Ì‚ğŒºŠÖ‚Ü‚Å‰^‚ñ‚Å‚­‚ê‚Ä•‚©‚è‚Ü‚·Bv“™‚ÌLOHACO‚ÌƒT[ƒrƒX©‘Ì‚Ö‚ÌƒŒƒrƒ…[j
-
-‚½‚¾‚µAè–@“I‚É‚Í²‚ª•s–¾‚È‚Æ‚«‚Ì•¶‘‚ÌƒNƒ‰ƒXƒ^ƒŠƒ“ƒO‚Æ‚µ‚Ä—LŒø‚©‚à‚µ‚ê‚È‚¢B
+ä¸Šè¨˜ã¯ã€ãƒ“ãƒ¼ãƒ«ã®ã‚³ãƒ¡ãƒ³ãƒˆã«ãŠç¾ã‚Œã‚‹ãƒˆãƒ”ãƒƒã‚¯ã¨ã€ãã®ãƒˆãƒ”ãƒƒã‚¯ä¸­ã«ç¾ã‚Œã‚‹ä¸Šä½ï¼•å˜èªã‚’ã‚ã‚‰ã‚ã—ãŸã‚‚ã®ã§ã€ã“ã“ã‹ã‚‰å„ãƒˆãƒ”ãƒƒã‚¯ã‚’è§£é‡ˆã—ã€è»¸ã®ä½œæˆã«å½¹ç«‹ã¦ã‚‹ã€‚
+ã“ã‚Œã‚‰ã®ãƒˆãƒ”ãƒƒã‚¯ã¯è§£é‡ˆå¯èƒ½ãªã‚‚ã®ã¨ä¸å¯èƒ½ãªã‚‚ã®ãŒã‚ã‚‹ãŒã€è§£é‡ˆå¯èƒ½ãªã‚‚ã®ã¯ä»¥ä¸‹ã®ã‚ˆã†ã«è§£é‡ˆã§ãã‚‹ã€‚
