@@ -1,0 +1,180 @@
+---
+title: "ビールレビューの軸検討"
+author: "松村優哉"
+date: "2016年7月11日"
+output: html_document
+---
+
+#概要
+トピックモデルを使って、形態素解析だけでは見つけられない新たな軸を発見できないか？
+
+#データの準備と概観
+```{r warning=FALSE}
+#準備----
+setwd("C:/Users/yuya_matsumura/Desktop/yahoo_lohaco/review/beer")
+
+library(readr)
+library(dplyr)
+library(stringr)
+library(RMeCab)
+library(lda)
+library(ggplot2)
+library(knitr)
+
+
+##読み込み
+dat <- read_csv("review_10k_2.csv", locale = locale(encoding = "cp932"))
+```
+
+まずはどのビールに多くコメントされているかを調べる
+```{r}
+beer_all <- dat %>%
+  filter(str_detect(dat$web_s_name, "ビール") == "TRUE") %>%
+  group_by(web_unique_name) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n))
+kable(head(beer_all, 10)) #先頭10行を表示
+```
+
+次にビールへのコメントデータの作成。
+```{r}
+beer <- dat %>%
+  filter(str_detect(dat$web_s_name, "ビール") == "TRUE") %>%
+  select(comment)
+kable(head(beer, 10))
+```
+
+#軸の検討
+##多く使われている語を使用する
+```{r}
+##RMeCabFreqのごみ掃除用の関数を作成----
+trush_delete <- function (x) {
+  x <- dplyr::filter(x, Info1 == c("名詞", "形容詞"), 
+              Info2 != "非自立",
+              #stringr::str_length(x$Term) > 1, #文字数2以上
+              stringr::str_detect(x$Term, '[:punct:]') == 'FALSE', 
+              str_detect(x$Term, '[A-z0-9]') == 'FALSE', #アルファベットと数字
+              str_detect(x$Term, '[Α-ω]') == 'FALSE', #ギリシャ文字
+              str_detect(x$Term, '[А-я]') == 'FALSE', #キリル文字
+              str_detect(x$Term, '[ｦ-ﾝ]') == 'FALSE' #半角カタカナ
+  )
+}
+
+#形態素解析(1語)
+uni_beer <- RMeCabFreq("beer.csv") %>%
+  trush_delete() %>%
+  arrange(desc(Freq))
+##write.csv(uni_beer, "ビール形態素.csv", row.names = FALSE)
+kable(head(uni_beer, 10))
+
+#バイグラム(2語の組み合わせ)
+bi_beer <- docDF(target = "beer.csv", type = 1, N = 2, Genkei = 1) %>%
+  arrange(desc(beer.csv))
+##write.csv(bi_beer, "ビールバイグラム.csv", row.names = FALSE)
+kable(head(bi_beer, 10))
+
+#トリグラム(3語の組み合わせ)
+tri_beer <- docDF(target = "beer.csv", type = 1, N = 3, Genkei = 1) %>%
+  arrange(desc(beer.csv))
+##write.csv(tri_beer, "ビールトリグラム.csv", row.names = FALSE)
+kable(head(tri_beer, 10))
+```
+
+###軸の検討
+以上の結果から、以下の二つの対立軸を作成。
+
+* 「健康志向（価格安め）」「高級志向」
+* 「飲みやすさ」「飲みごたえ」
+
+しかし、スコアリングの結果あまり安定しなかった。
+
+そこで、トピックモデルによる新たな軸の作成を試みる。
+
+##トピックモデルでの評価
+今回は潜在ディリクレ過程(Latent Dirichlet Allocation, LDA)を用いた。
+
+###LDAとは
+1つの文書が複数のトピックから成ることを仮定した言語モデルの一種。詳細は以下の画像および引用先を参照。
+
+![](http://f.st-hatena.com/images/fotolife/n/ni66ling/20150504/20150504032913_original.png?1430677772)
+
+（引用：[LDAの各変数の意味と幾何的解釈について](http://ni66ling.hatenadiary.jp/entry/2015/05/04/163958)）
+
+$\alpha$と$\beta$(プログラム上は$\eta$になっている)はハイパーパラメータとして与える。
+
+今回は1コメント1文書として分析を行った。
+
+###LDAの実行
+```{r}
+#トピックモデル----
+##形態素解析
+beer_txt <- RMeCabText("beer.csv")
+
+##空のデータフレームを作成
+beer_doc <- NULL
+
+##要素の一番最初（文中に出現する語形）のみ取り出す
+for (i in 1:length(beer_txt)) {
+  if (beer_txt[[i]][2] %in% c("名詞", "形容詞")) {
+    beer_doc <- c(beer_doc, paste(beer_txt[[i]][1], sep = "", collapse = " "))
+  }
+}
+
+##コーパスの作成
+beer_lex <- lexicalize(beer_doc, lower = TRUE)
+
+##ギッブスサンプリングで解析
+k <- 10 #トピック数
+
+set.seed(123)
+result <- lda.collapsed.gibbs.sampler(beer_lex$documents, 
+                                      k,
+                                      beer_lex$vocab,
+                                      burnin = 500,
+                                      1000,  # 繰り返し数
+                                      10, # トピックの生起パラメータalpha
+                                      1, # ディリクレ分布のスカラパラメータeta
+                                      compute.log.likelihood=TRUE)
+## 結果を表示 
+summary(result)
+#head(result$log.likelihoods)
+
+log_likelihoods <- t(result$log.likelihoods) %>%
+  as_data_frame()
+
+Iteration <- 1:nrow(log_likelihoods)
+
+##対数尤度をプロット。収束の確認。
+ggplot(log_likelihoods, aes(x = Iteration, y = Log_Likelihoods)) +
+  geom_line(aes(y = V1, colour = "V1")) +
+  geom_line(aes(y = V2, colour = "V2")) +
+  scale_color_hue(name = "種類", labels = c(V1 = "Full", V2 ="Obs") )
+```
+
+赤が事前分布を含めた対数尤度、青が観測されたものからのみの対数尤度。
+青いほうに注目すればよく、対数尤度が収束していることを確認。
+
+```{r}
+## 各トピックにおける上位5位の単語の行列
+##(各トピックで現れる確率が高い単語)
+top.words <- top.topic.words(result$topics, 5, by.score = TRUE) %>%
+  as_data_frame()
+colnames(top.words) <- c("Topic1", "Topic2", "Topic3", "Topic4", "Topic5", "Topic6", "Topic7", "Topic8", "Topic9", "Topic10")
+kable(top.words)
+```
+
+上記は、ビールのコメントにお現れるトピックと、そのトピック中に現れる上位５単語をあらわしたもので、ここから各トピックを解釈し、軸の作成に役立てる。
+これらのトピックは解釈可能なものと不可能なものがあるが、解釈可能なものは以下のように解釈できる。
+
+* トピック2: LOHACOのサービスに対する好評価
+* トピック5: ノンアルコール（ビールテイスト飲料）へのレビュー
+* トピック6: トクホや（カロリーなどが）0のものへのレビュー
+* トピック7: 健康志向、糖分0
+* トピック8: 健康志向、脂肪0
+
+#結論
+LDAによるコメントのクラスタリングを行ったが、新たな軸を発見することはできなかった。
+
+軸として評価できるのは「健康志向」のみだった。実際、スコアリングの結果も健康志向以外は関係ないコメントがスコア上位であった。（特に「重いものを玄関まで運んでくれて助かります。」等のLOHACOのサービス自体へのレビュー）
+
+ただし、手法的には軸が不明なときの文書のクラスタリングとして有効かもしれない。
