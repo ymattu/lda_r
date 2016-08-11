@@ -12,7 +12,7 @@ Windowsで実施
 #データの準備と概観
 ```{r warning=FALSE}
 #準備----
-setwd("C:/Users/yuya_matsumura/Desktop/yahoo_lohaco/review/beer")
+setwd("path")
 
 library(readr)
 library(dplyr)
@@ -30,19 +30,19 @@ dat <- read_csv("hoge.csv", locale = locale(encoding = "cp932"))
 まずはどのビールに多くコメントされているかを調べる
 ```{r}
 beer_all <- dat %>%
-  filter(str_detect(dat$web_s_name, "ビール") == "TRUE") %>%
+  filter(str_detect(dat$web_s_name, "hoge") == "TRUE") %>%
   group_by(web_unique_name) %>%
   summarise(n = n()) %>%
   arrange(desc(n))
-kable(head(beer_all, 10)) #先頭10行を表示
+kable(head(hoge_all, 10)) #先頭10行を表示
 ```
 
 次にビールへのコメントデータの作成。
 ```{r}
-beer <- dat %>%
-  filter(str_detect(dat$web_s_name, "ビール") == "TRUE") %>%
+hogehoge <- dat %>%
+  filter(str_detect(dat$name, "hoge") == "TRUE") %>%
   select(comment)
-kable(head(beer, 10))
+kable(head(hoge, 10))
 ```
 
 
@@ -62,23 +62,23 @@ trush_delete <- function (x) {
 }
 
 #形態素解析(1語)
-uni_beer <- RMeCabFreq("beer.csv") %>%
+uni_beer <- RMeCabFreq("hoge.csv") %>%
   trush_delete() %>%
   arrange(desc(Freq))
-##write.csv(uni_beer, "ビール形態素.csv", row.names = FALSE)
+##write.csv(uni_beer, "hoge形態素.csv", row.names = FALSE)
 kable(head(uni_beer, 10))
 
 #バイグラム(2語の組み合わせ)
-bi_beer <- docDF(target = "beer.csv", type = 1, N = 2, Genkei = 1) %>%
-  arrange(desc(beer.csv))
-##write.csv(bi_beer, "ビールバイグラム.csv", row.names = FALSE)
-kable(head(bi_beer, 10))
+bi_beer <- docDF(target = "hoge.csv", type = 1, N = 2, Genkei = 1) %>%
+  arrange(desc(hoge.csv))
+##write.csv(bi_hoge, "バイグラム.csv", row.names = FALSE)
+kable(head(bi_hoge, 10))
 
 #トリグラム(3語の組み合わせ)
-tri_beer <- docDF(target = "beer.csv", type = 1, N = 3, Genkei = 1) %>%
-  arrange(desc(beer.csv))
-##write.csv(tri_beer, "ビールトリグラム.csv", row.names = FALSE)
-kable(head(tri_beer, 10))
+tri_beer <- docDF(target = "hoge.csv", type = 1, N = 3, Genkei = 1) %>%
+  arrange(desc(hoge.csv))
+##write.csv(tri_hoge, "トリグラム.csv", row.names = FALSE)
+kable(head(tri_hoge, 10))
 ```
 
 ##トピックモデルでの評価
@@ -99,26 +99,26 @@ $\alpha$と$\beta$(プログラム上は$\eta$になっている)はハイパー
 ```{r}
 #トピックモデル----
 ##形態素解析
-beer_txt <- RMeCabText("beer.csv")
+hoge_txt <- RMeCabText("hoge.csv")
 
 ##空のデータフレームを作成
-beer_doc <- NULL
+hoge_doc <- NULL
 
 ##要素の一番最初（文中に出現する語形）のみ取り出す
-for (i in 1:length(beer_txt)) {
+for (i in 1:length(hoge_txt)) {
   if (beer_txt[[i]][2] %in% c("名詞", "形容詞")) {
-    beer_doc <- c(beer_doc, paste(beer_txt[[i]][1], sep = "", collapse = " "))
+    beer_doc <- c(hoge_doc, paste(hoge_txt[[i]][1], sep = "", collapse = " "))
   }
 }
 
 ##コーパスの作成
-beer_lex <- lexicalize(beer_doc, lower = TRUE)
+hoge_lex <- lexicalize(hoge_doc, lower = TRUE)
 
 ##ギッブスサンプリングで解析
 k <- 10 #トピック数
 
 set.seed(123)
-result <- lda.collapsed.gibbs.sampler(beer_lex$documents, 
+result <- lda.collapsed.gibbs.sampler(hoge_lex$documents, 
                                       k,
                                       beer_lex$vocab,
                                       burnin = 500,
@@ -154,5 +154,5 @@ colnames(top.words) <- c("Topic1", "Topic2", "Topic3", "Topic4", "Topic5", "Topi
 kable(top.words)
 ```
 
-上記は、ビールのコメントにお現れるトピックと、そのトピック中に現れる上位５単語をあらわしたもので、ここから各トピックを解釈し、軸の作成に役立てる。
+上記は、hogeのコメントにお現れるトピックと、そのトピック中に現れる上位５単語をあらわしたもので、ここから各トピックを解釈し、軸の作成に役立てる。
 これらのトピックは解釈可能なものと不可能なものがあるが、解釈可能なものは以下のように解釈できる。
