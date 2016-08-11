@@ -27,11 +27,11 @@ library(knitr)
 dat <- read_csv("hoge.csv", locale = locale(encoding = "cp932"))
 ```
 
-まずはどのビールに多くコメントされているかを調べる
+まずはどの商品に多くコメントされているかを調べる
 ```{r}
-beer_all <- dat %>%
-  filter(str_detect(dat$web_s_name, "hoge") == "TRUE") %>%
-  group_by(web_unique_name) %>%
+hoge_all <- dat %>%
+  filter(str_detect(dat$name, "hoge") == "TRUE") %>%
+  group_by(unique_name) %>%
   summarise(n = n()) %>%
   arrange(desc(n))
 kable(head(hoge_all, 10)) #先頭10行を表示
@@ -62,20 +62,20 @@ trush_delete <- function (x) {
 }
 
 #形態素解析(1語)
-uni_beer <- RMeCabFreq("hoge.csv") %>%
+uni_hoge <- RMeCabFreq("hoge.csv") %>%
   trush_delete() %>%
   arrange(desc(Freq))
 ##write.csv(uni_beer, "hoge形態素.csv", row.names = FALSE)
 kable(head(uni_beer, 10))
 
 #バイグラム(2語の組み合わせ)
-bi_beer <- docDF(target = "hoge.csv", type = 1, N = 2, Genkei = 1) %>%
+bi_hoge <- docDF(target = "hoge.csv", type = 1, N = 2, Genkei = 1) %>%
   arrange(desc(hoge.csv))
 ##write.csv(bi_hoge, "バイグラム.csv", row.names = FALSE)
 kable(head(bi_hoge, 10))
 
 #トリグラム(3語の組み合わせ)
-tri_beer <- docDF(target = "hoge.csv", type = 1, N = 3, Genkei = 1) %>%
+tri_hoge <- docDF(target = "hoge.csv", type = 1, N = 3, Genkei = 1) %>%
   arrange(desc(hoge.csv))
 ##write.csv(tri_hoge, "トリグラム.csv", row.names = FALSE)
 kable(head(tri_hoge, 10))
